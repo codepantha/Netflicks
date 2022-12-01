@@ -1,11 +1,25 @@
-import React from 'react';
+import axios from './axios';
+import React, { useEffect, useState } from 'react';
 import './Banner.css';
+import requests from './requests';
 
 const Banner = () => {
+  const [movie, setMovie] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await axios.get(requests.fetchNetflixOriginals);
+      const data = await response.data.results;
+      setMovie(data[Math.floor(Math.random() * data.length - 1)]);
+      return response;
+    }
+
+    fetchData();
+  }, []);
+
   const backgroundImage = {
     backgroundSize: 'cover',
-    backgroundImage:
-      'url("https://i.pinimg.com/550x/8f/6e/5b/8f6e5bb87474fcd8e7a6c96e280b2684.jpg")',
+    backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie?.backdrop_path}")`,
     backgroundPosition: 'center center'
   };
 
@@ -16,32 +30,17 @@ const Banner = () => {
   return (
     <header className="banner" style={backgroundImage}>
       <div className="banner__content">
-        <h1 className="banner__title">Movie Name</h1>
+        <h1 className="banner__title">
+          {movie?.title || movie?.name || movie?.original_name}
+        </h1>
         <div className="banner__buttons">
           <button className="banner__button">Play</button>
           <button className="banner__button">My List</button>
         </div>
-        <p className="banner__description">
-          {truncate(`This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description
-        This is a test description`)}
-        </p>
+        <p className="banner__description">{truncate(movie?.overview)}</p>
       </div>
 
-      <div className="banner--fadeButton" />
+      <div className="banner--fadeBottom" />
     </header>
   );
 };
