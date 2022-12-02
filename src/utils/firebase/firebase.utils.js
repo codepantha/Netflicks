@@ -1,6 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore'
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBFbLY2WKCMpO9noC8g8_LgM0_dAZYXoB4',
@@ -18,14 +23,25 @@ export const auth = getAuth();
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return undefined;
-  const user = await createUserWithEmailAndPassword(auth, email, password)
+  const user = await createUserWithEmailAndPassword(auth, email, password);
   return user;
-}
+};
 
 export const authenticateUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return undefined;
-  const user = await signInWithEmailAndPassword(auth, email, password)
+  const user = await signInWithEmailAndPassword(auth, email, password);
   return user;
-}
+};
+
+export const getCurrentUser = () => new Promise((resolve, reject) => {
+  const unsubscribe = onAuthStateChanged(
+    auth,
+    (authUser) => {
+      unsubscribe();
+      resolve(authUser);
+    },
+    reject
+  );
+});
 
 export default db;
